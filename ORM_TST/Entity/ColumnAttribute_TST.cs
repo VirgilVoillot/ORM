@@ -9,7 +9,7 @@ namespace ORM_TST
         private ColumnAttribute column;
 
         private void Initialize(){
-            this.column = new ColumnAttribute(Constants.COLUMN_NAME);
+            this.column = new ColumnAttribute(Constants.COLUMN_CLIENT_ID_NAME);
         }
 
         [TestMethod]
@@ -19,7 +19,7 @@ namespace ORM_TST
 
             string result = column.Name;
 
-            Assert.AreEqual(Constants.COLUMN_NAME, result);
+            Assert.AreEqual(Constants.COLUMN_CLIENT_ID_NAME, result);
         }
     }
 }

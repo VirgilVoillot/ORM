@@ -21,9 +21,9 @@ namespace ORM_TST
         {
             Initialize();
 
-            string result = entity.Table();
+            var result = (TableAttribute)System.Attribute.GetCustomAttribute(entity.GetType(), typeof(TableAttribute));
 
-            Assert.AreEqual(Constants.TABLE_NAME, result);
+            Assert.AreEqual(Constants.TABLE_NAME, result.Name);
         }
 
         [TestMethod]
@@ -39,7 +39,7 @@ namespace ORM_TST
                     var attr = (ColumnAttribute)System.Attribute.GetCustomAttribute(property, typeof(ColumnAttribute));
 
                     if(attr != null){
-                        hasAttribute = attr.Name == Constants.COLUMN_NAME;
+                        hasAttribute = attr.Name == Constants.COLUMN_CLIENT_ID_NAME;
                     }
                 }
                                 
