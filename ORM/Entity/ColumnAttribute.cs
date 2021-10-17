@@ -9,9 +9,11 @@ namespace ORM
     {
         
         public string Name;
+        public bool IncludeDefaultValueInResearch;
 
         public ColumnAttribute(string _name){
             this.Name = _name;
+            IncludeDefaultValueInResearch = false;
         }
 
     }

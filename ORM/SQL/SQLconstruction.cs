@@ -10,15 +10,15 @@ namespace ORM {
             set=> _sqlRequest = value;
         }
 
-        private object[] _params;
-        public object[] Params{
+        private SQLparameter[] _params;
+        public SQLparameter[] Params{
             get=> _params;
             set=> _params = value;
         }
 
         public SQLconstruction(){
             _sqlRequest = String.Empty;
-            _params = new object[0];
+            _params = new SQLparameter[0];
         }
     }
 }

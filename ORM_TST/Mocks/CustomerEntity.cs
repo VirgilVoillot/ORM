@@ -1,8 +1,9 @@
 using ORM;
-
+namespace ORM_TST
+{
 
 [TableAttribute(Constants.TABLE_NAME)]
-public class FakeEntity : Entity {
+public class CustomerEntity : Entity {
         
     private int _propertyNotInDB;
     public int PropertyNotInDB{
@@ -30,4 +31,5 @@ public class FakeEntity : Entity {
         get => _clientLastName;
         set => _clientLastName = value;
     }
+}
 }

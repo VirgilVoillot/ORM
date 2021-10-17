@@ -5,12 +5,11 @@ namespace ORM {
 
     public class TransformerSQL : ITransformerSQL{
 
-        public SQLconstruction createSelectRequest<T>(){
+        public SQLconstruction createSelectRequest<T>(T entity){
 
             SQLconstruction sql = new SQLconstruction();
-            string request = GetSelectPartOfRequest<T>();
-            sql.SQLrequest = request;
-            
+            sql.SQLrequest = GetSelectPartOfRequest<T>();
+            AdjustSQLcontructionWithEntityForConditions(sql,entity);
             return sql;
         }
 
@@ -37,6 +36,48 @@ namespace ORM {
             return request;
         }
 
+        private void AdjustSQLcontructionWithEntityForConditions(SQLconstruction sql,object entity){
 
+            List<KeyValuePair<string,object>> listOfParameter = new List<KeyValuePair<string,object>>();
+
+            foreach(System.Reflection.PropertyInfo property in entity.GetType().GetProperties()){
+                
+                var attr = (ColumnAttribute)System.Attribute.GetCustomAttribute(property, typeof(ColumnAttribute));
+                if(attr == null)
+                    continue;
+                var value = property.GetValue(entity);
+                if(value == null)
+                    continue;
+                if(!attr.IncludeDefaultValueInResearch){
+                    if(object.Equals(value,default(int)))
+                        continue;
+                    if(object.Equals(value,default(bool)))
+                        continue;
+                }
+                listOfParameter.Add(new KeyValuePair<string, object>(attr.Name,value));
+            }
+
+            SQLparameter[] parameters = new SQLparameter[listOfParameter.Count];
+            List<string> listOfSearchCondition = new List<string>();
+
+            for(int index = 0; index < listOfParameter.Count; index++){
+
+                SQLparameter param = new SQLparameter();
+                param.Name = ConstantsSQL.PARAM_NAME+index.ToString();
+                param.Value = listOfParameter[index].Value;
+                parameters[index] = param;
+
+                listOfSearchCondition.Add(listOfParameter[index].Key + ConstantsSQL.EQUALITY + ConstantsSQL.BINDVARIABLE+param.Name);
+            }
+
+            if(listOfSearchCondition.Count != 0){
+                sql.SQLrequest += ConstantsSQL.KEYWORD_WHERE + String.Join(ConstantsSQL.KEYWORD_AND, listOfSearchCondition.ToArray());
+                sql.Params = parameters;
+                listOfSearchCondition.Clear();
+            }
+            listOfParameter.Clear();
+            listOfParameter = null;
+            listOfSearchCondition = null;
+        }
     }
 }

@@ -7,11 +7,11 @@ namespace ORM_TST
     public class Entity_TST
     {
 
-        private FakeEntity entity;
+        private CustomerEntity entity;
 
         private void Initialize(){
 
-            entity = new FakeEntity();
+            entity = new CustomerEntity();
 
         }
 
