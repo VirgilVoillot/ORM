@@ -7,25 +7,6 @@ namespace ORM_TST
     public class Entity_TST
     {
 
-        private const string TABLE_NAME = "CUSTOMER";
-        private const string COLUMN_NAME = "CLIENT_ID";
-        private const string PROPERTY_NAME = "ClientID";
-
-        private class FakeEntity : Entity {
-            
-            public override string Table(){
-                return TABLE_NAME;
-            }
-
-            private int _clientID;
-            [ColumnAttribute(COLUMN_NAME)]
-            public int ClientID{
-                get => _clientID;
-                set => _clientID = value;
-            }
-
-        }
-
         private FakeEntity entity;
 
         private void Initialize(){
@@ -42,23 +23,23 @@ namespace ORM_TST
 
             string result = entity.Table();
 
-            Assert.AreEqual(TABLE_NAME, result);
+            Assert.AreEqual(Constants.TABLE_NAME, result);
         }
 
         [TestMethod]
-        public void GivenColumnNameAsAttributColumn_WhenWeLookForThisAttribut_ThenWeFinddIt()
+        public void GivenColumnNameAsAttributColumn_WhenWeLookForThisAttribut_ThenWeFindIt()
         {
             Initialize();
             bool hasAttribute = false;
             
             foreach(System.Reflection.PropertyInfo property in entity.GetType().GetProperties()){
                 
-                if(property.Name == PROPERTY_NAME){
+                if(property.Name == Constants.PROPERTY_NAME){
 
                     var attr = (ColumnAttribute)System.Attribute.GetCustomAttribute(property, typeof(ColumnAttribute));
 
                     if(attr != null){
-                        hasAttribute = attr.Name == COLUMN_NAME;
+                        hasAttribute = attr.Name == Constants.COLUMN_NAME;
                     }
                 }
                                 
