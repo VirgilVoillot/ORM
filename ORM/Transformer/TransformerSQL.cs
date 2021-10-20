@@ -6,7 +6,7 @@ namespace ORM {
 
     public class TransformerSQL : ITransformerSQL{
 
-        public SQLconstruction createSelectRequest<T>(T entity){
+        public SQLconstruction createSelectRequest<T>(T entity) where T:Entity{
 
             SQLconstruction sql = new SQLconstruction();
             sql.SQLrequest = GetSelectPartOfRequest<T>();
@@ -14,7 +14,7 @@ namespace ORM {
             return sql;
         }
 
-        public SQLconstruction createDeleteRequest<T>(T entity){
+        public SQLconstruction createDeleteRequest<T>(T entity) where T:Entity{
             SQLconstruction sql = new SQLconstruction();
             TableAttribute attr = GetTableAttribute<T>();
             sql.SQLrequest = ConstantsSQL.KEYWORD_DELETE + ConstantsSQL.KEYWORD_FROM + attr.Name;
@@ -24,7 +24,7 @@ namespace ORM {
             return sql;
         }
 
-        private string GetSelectPartOfRequest<T>(){
+        private string GetSelectPartOfRequest<T>() where T:Entity{
             string request = ConstantsSQL.KEYWORD_SELECT;
 
             var tableAttribute = GetTableAttribute<T>();
@@ -45,7 +45,7 @@ namespace ORM {
             return request;
         }
 
-        private TableAttribute GetTableAttribute<T>(){
+        private TableAttribute GetTableAttribute<T>() where T:Entity{
             TableAttribute tableAttribute = (TableAttribute)System.Attribute.GetCustomAttribute(typeof(T), typeof(TableAttribute));
             if(tableAttribute == null)
                 throw new MissingTableAttributException(typeof(T).Name);

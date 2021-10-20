@@ -4,8 +4,8 @@ namespace ORM {
 
     public interface ITransformerSQL{
         
-        SQLconstruction createSelectRequest<T>(T entity);
-        SQLconstruction createDeleteRequest<T>(T entity);
+        SQLconstruction createSelectRequest<T>(T entity) where T:Entity;
+        SQLconstruction createDeleteRequest<T>(T entity) where T:Entity;
 
     }
 }

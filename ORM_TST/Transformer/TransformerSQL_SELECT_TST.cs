@@ -31,9 +31,9 @@ namespace ORM_TST
         [ExpectedException(typeof(MissingTableAttributException))]
         public void GivenAClassWithoutTableAttribute_WhenCreateSelectRequest_ThenThrowMissingTableAttributeException(){
             Initialize();
-            var obj = new object();
+            var obj = new EntityWithoutAttribute();
 
-            SQLconstruction result = transformerSQL.createSelectRequest<object>(obj);
+            SQLconstruction result = transformerSQL.createSelectRequest<EntityWithoutAttribute>(obj);
         }
 
 
