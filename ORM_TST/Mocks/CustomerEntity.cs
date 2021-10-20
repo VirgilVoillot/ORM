@@ -12,7 +12,7 @@ public class CustomerEntity : Entity {
     }
 
     private int _clientID;
-    [ColumnAttribute(Constants.COLUMN_CLIENT_ID_NAME)]
+    [ColumnAttribute(Constants.COLUMN_CLIENT_ID_NAME, IsPrimaryKey =true)]
     public int ClientID{
         get => _clientID;
         set => _clientID = value;

@@ -1,10 +1,12 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 using ORM;
+
 
 namespace ORM_TST
 {
     [TestClass]
-    public class TransformerSQL_TST
+    public class TransformerSQL_SELECT_TST
     {
         
         private const string REQUEST_SELECT_WITHOUT_CONDITION = ConstantsSQL.KEYWORD_SELECT + Constants.COLUMN_CLIENT_ID_NAME + ", " + 
@@ -58,7 +60,7 @@ namespace ORM_TST
 
             SQLconstruction result = transformerSQL.createSelectRequest<CustomerEntity>(entity);
 
-            Assert.IsTrue(result.Params.Length == 0);
+            Assert.IsFalse(result.Params.Any());
         }
 
 

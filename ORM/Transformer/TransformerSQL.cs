@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ORM {
 
@@ -9,16 +10,24 @@ namespace ORM {
 
             SQLconstruction sql = new SQLconstruction();
             sql.SQLrequest = GetSelectPartOfRequest<T>();
-            AdjustSQLcontructionWithEntityForConditions(sql,entity);
+            AdjustSQLcontructionWithEntityForConditions(sql,entity, false);
+            return sql;
+        }
+
+        public SQLconstruction createDeleteRequest<T>(T entity){
+            SQLconstruction sql = new SQLconstruction();
+            TableAttribute attr = GetTableAttribute<T>();
+            sql.SQLrequest = ConstantsSQL.KEYWORD_DELETE + ConstantsSQL.KEYWORD_FROM + attr.Name;
+            AdjustSQLcontructionWithEntityForConditions(sql,entity,true);
+            if(!sql.Params.Any())
+                throw new GenericDeleteException(sql.SQLrequest);
             return sql;
         }
 
         private string GetSelectPartOfRequest<T>(){
             string request = ConstantsSQL.KEYWORD_SELECT;
 
-            var tableAttribute = (TableAttribute)System.Attribute.GetCustomAttribute(typeof(T), typeof(TableAttribute));
-            if(tableAttribute == null)
-                throw new MissingTableAttributException(typeof(T).Name);
+            var tableAttribute = GetTableAttribute<T>();
 
             List<string> listOfColumns = new List<string>();
 
@@ -36,7 +45,14 @@ namespace ORM {
             return request;
         }
 
-        private void AdjustSQLcontructionWithEntityForConditions(SQLconstruction sql,object entity){
+        private TableAttribute GetTableAttribute<T>(){
+            TableAttribute tableAttribute = (TableAttribute)System.Attribute.GetCustomAttribute(typeof(T), typeof(TableAttribute));
+            if(tableAttribute == null)
+                throw new MissingTableAttributException(typeof(T).Name);
+            return tableAttribute;
+        }
+
+        private void AdjustSQLcontructionWithEntityForConditions(SQLconstruction sql,object entity, bool useOnlyPrimaryKey){
 
             List<KeyValuePair<string,object>> listOfParameter = new List<KeyValuePair<string,object>>();
 
@@ -54,6 +70,9 @@ namespace ORM {
                     if(object.Equals(value,default(bool)))
                         continue;
                 }
+                if(useOnlyPrimaryKey && !attr.IsPrimaryKey)
+                    continue;
+
                 listOfParameter.Add(new KeyValuePair<string, object>(attr.Name,value));
             }
 

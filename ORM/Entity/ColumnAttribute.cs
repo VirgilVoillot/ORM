@@ -10,10 +10,12 @@ namespace ORM
         
         public string Name;
         public bool IncludeDefaultValueInResearch;
+        public bool IsPrimaryKey;
 
         public ColumnAttribute(string _name){
             this.Name = _name;
             IncludeDefaultValueInResearch = false;
+            IsPrimaryKey = false;
         }
 
     }
