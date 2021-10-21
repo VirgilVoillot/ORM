@@ -4,6 +4,7 @@ namespace ORM {
 
         public const string KEYWORD_SELECT = "SELECT ";
         public const string KEYWORD_DELETE = "DELETE";
+        public const string KEYWORD_UPDATE = "UPDATE {0} SET ";
         public const string COMMON_AND_SPACE = ", ";
         public const string KEYWORD_FROM = " FROM ";
         public const string KEYWORD_WHERE = " WHERE ";

@@ -11,11 +11,13 @@ namespace ORM
         public string Name;
         public bool IncludeDefaultValueInResearch;
         public bool IsPrimaryKey;
+        public bool PreventUpdate;
 
         public ColumnAttribute(string _name){
             this.Name = _name;
             IncludeDefaultValueInResearch = false;
             IsPrimaryKey = false;
+            PreventUpdate = false;
         }
 
     }

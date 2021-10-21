@@ -9,4 +9,6 @@ public class Constants{
     public const string PROPERTY_NAME = "ClientID";
 
     public const int CLIENT_ID = 42;
+    public const string FIRST_NAME = "John";
+    public const string LAST_NAME = "Doe";
 }

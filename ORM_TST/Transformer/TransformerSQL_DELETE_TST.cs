@@ -18,7 +18,16 @@ namespace ORM_TST
         }
 
         [TestMethod()]
-        [ExpectedException(typeof(GenericDeleteException))]
+        [ExpectedException(typeof(MissingTableAttributException))]
+        public void GivenAClassWithoutTableAttribute_WhenCreateDeleteRequest_ThenThrowMissingTableAttributeException(){
+            Initialize();
+            var obj = new EntityWithoutAttribute();
+
+            transformerSQL.createDeleteRequest<EntityWithoutAttribute>(obj);
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(GenericFilterInRequestException))]
         public void GivenEntityWithoutPrimaryKeyWithValue_WhenCreateDeleteRequest_ThenThrowGenericDeleteException(){
             Initialize();
 
