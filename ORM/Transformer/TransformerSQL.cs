@@ -10,7 +10,7 @@ namespace ORM {
 
             SQLconstruction sql = new SQLconstruction();
             sql.SQLrequest = GetSelectPartOfRequest<T>();
-            AdjustSQLconstructionWithEntityForConditions(sql,entity, false);
+            AdjustSQLconstructionWithEntityForFilters(sql,entity, false);
             return sql;
         }
 
@@ -39,7 +39,7 @@ namespace ORM {
             SQLconstruction sql = new SQLconstruction();
             TableAttribute attr = GetTableAttribute<T>();
             sql.SQLrequest = ConstantsSQL.KEYWORD_DELETE + ConstantsSQL.KEYWORD_FROM + attr.Name;
-            AdjustSQLconstructionWithEntityForConditions(sql,entity,true);
+            AdjustSQLconstructionWithEntityForFilters(sql,entity,true);
             return sql;
         }
 
@@ -47,8 +47,8 @@ namespace ORM {
             SQLconstruction sql = new SQLconstruction();
             TableAttribute attr = GetTableAttribute<T>();
             sql.SQLrequest = String.Format(ConstantsSQL.KEYWORD_UPDATE, attr.Name);
-            AdjustSQLconstructionWithEntityForChangement(sql,entity);
-            AdjustSQLconstructionWithEntityForConditions(sql,entity, true);
+            AdjustSQLconstructionWithEntityForChangeParameters(sql,entity);
+            AdjustSQLconstructionWithEntityForFilters(sql,entity, true);
             return sql;
         }
 
@@ -61,7 +61,7 @@ namespace ORM {
             return tableAttribute;
         }
 
-        private void AdjustSQLconstructionWithEntityForChangement(SQLconstruction sql,Entity entity){
+        private void AdjustSQLconstructionWithEntityForChangeParameters(SQLconstruction sql,Entity entity){
 
             List<KeyValuePair<string,object>> listOfParameter = new List<KeyValuePair<string,object>>();
             foreach(System.Reflection.PropertyInfo property in entity.GetType().GetProperties()){
@@ -79,30 +79,11 @@ namespace ORM {
             if(!listOfParameter.Any())
                 throw new NoColumnToChangeException();
 
-            SQLparameter[] parameters = new SQLparameter[listOfParameter.Count];
-            List<string> listOfSearchCondition = new List<string>();
 
-            for(int index = 0; index < listOfParameter.Count; index++){
-
-                SQLparameter param = new SQLparameter();
-                param.Name = ConstantsSQL.PARAM_NAME+index.ToString();
-                param.Value = listOfParameter[index].Value;
-                parameters[index] = param;
-
-                listOfSearchCondition.Add(listOfParameter[index].Key + ConstantsSQL.EQUALITY + ConstantsSQL.BINDVARIABLE+param.Name);
-            }
-
-            if(listOfSearchCondition.Any()){
-                sql.SQLrequest += String.Join(ConstantsSQL.COMMON_AND_SPACE, listOfSearchCondition.ToArray());
-                sql.Params = parameters;
-                listOfSearchCondition.Clear();
-            }
-            listOfParameter.Clear();
-            listOfParameter = null;
-            listOfSearchCondition = null;
+            GetAllParametersForBinding(sql,listOfParameter, x => {return String.Join(ConstantsSQL.COMMON_AND_SPACE, x.ToArray());});
         }
 
-        private void AdjustSQLconstructionWithEntityForConditions(SQLconstruction sql,Entity entity, bool useOnlyPrimaryKey){
+        private void AdjustSQLconstructionWithEntityForFilters(SQLconstruction sql,Entity entity, bool useOnlyPrimaryKey){
 
             List<KeyValuePair<string,object>> listOfParameter = new List<KeyValuePair<string,object>>();
 
@@ -128,7 +109,11 @@ namespace ORM {
 
             if(useOnlyPrimaryKey && !listOfParameter.Any())
                 throw new GenericFilterInRequestException();
+                
+            GetAllParametersForBinding(sql,listOfParameter, x => {return ConstantsSQL.KEYWORD_WHERE + String.Join(ConstantsSQL.KEYWORD_AND, x.ToArray());});
+        }
 
+        private void GetAllParametersForBinding(SQLconstruction sql,List<KeyValuePair<string,object>> listOfParameter, GetParamBindVariableConcatenation f){
             int numberOfParameterAlreadyInRequest = sql.Params.Length;
             SQLparameter[] parameters = new SQLparameter[listOfParameter.Count];
             List<string> listOfSearchCondition = new List<string>();
@@ -142,9 +127,9 @@ namespace ORM {
 
                 listOfSearchCondition.Add(listOfParameter[index].Key + ConstantsSQL.EQUALITY + ConstantsSQL.BINDVARIABLE+param.Name);
             }
-
+            
             if(listOfSearchCondition.Any()){
-                sql.SQLrequest += ConstantsSQL.KEYWORD_WHERE + String.Join(ConstantsSQL.KEYWORD_AND, listOfSearchCondition.ToArray());
+                sql.SQLrequest += f(listOfSearchCondition);
                 List<SQLparameter> list = new List<SQLparameter>(sql.Params);
                 list.AddRange(parameters);
                 sql.Params = list.ToArray();
@@ -152,9 +137,12 @@ namespace ORM {
                 list = null;
                 listOfSearchCondition.Clear();
             }
+
             listOfParameter.Clear();
             listOfParameter = null;
             listOfSearchCondition = null;
         }
+
+        private delegate string GetParamBindVariableConcatenation(List<string> listOfSearchCondition);
     }
 }
